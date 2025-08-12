@@ -285,14 +285,22 @@ public partial class Form1 : Form
             return;
         }
 
-        // Get bounds
+        // Get bounds from cities
         double minX = _cities.Min(c => c.X);
         double maxX = _cities.Max(c => c.X);
         double minY = _cities.Min(c => c.Y);
         double maxY = _cities.Max(c => c.Y);
+
+        // Expand bounds slightly
         double dx = Math.Max(1, (maxX - minX) * 0.05);
         double dy = Math.Max(1, (maxY - minY) * 0.05);
         minX -= dx; maxX += dx; minY -= dy; maxY += dy;
+
+        // Make sure (0,0) is inside the bounds for axis crossing
+        if (minX > 0) minX = 0;
+        if (maxX < 0) maxX = 0;
+        if (minY > 0) minY = 0;
+        if (maxY < 0) maxY = 0;
 
         const int pad = 40;
         int left = rect.Left + pad, right = rect.Right - pad;
@@ -303,48 +311,53 @@ public partial class Form1 : Form
 
         PointF Map(double x, double y)
         {
-            double sx = (maxX - minX) == 0 ? 0.5 : (x - minX) / (maxX - minX);
-            double sy = (maxY - minY) == 0 ? 0.5 : (y - minY) / (maxY - minY);
+            double sx = (x - minX) / (maxX - minX);
+            double sy = (y - minY) / (maxY - minY);
             float px = left + (float)(sx * width);
             float py = bottom - (float)(sy * height); // invert Y
             return new PointF(px, py);
         }
 
-        using (var axisPen = new Pen(Color.Black, 1))
-        {
-            // Draw X-axis at minY
-            var xAxisY = Map(0, minY).Y; // baseline bottom
-            g.DrawLine(axisPen, left, bottom, right, bottom);
+        using var axisPen = new Pen(Color.Black, 1);
 
-            // Draw Y-axis at minX
-            var yAxisX = Map(minX, 0).X; // baseline left
-            g.DrawLine(axisPen, left, top, left, bottom);
+        // X-axis at Y=0
+        if (minY <= 0 && maxY >= 0)
+        {
+            var y0 = Map(0, 0).Y;
+            g.DrawLine(axisPen, left, y0, right, y0);
+        }
+
+        // Y-axis at X=0
+        if (minX <= 0 && maxX >= 0)
+        {
+            var x0 = Map(0, 0).X;
+            g.DrawLine(axisPen, x0, top, x0, bottom);
         }
 
         using var labelBrush = new SolidBrush(Color.Black);
 
-        // X-axis ticks & labels
+        // X-axis ticks
         int xTicks = 5;
         for (int i = 0; i <= xTicks; i++)
         {
             double val = minX + i * (maxX - minX) / xTicks;
-            var p = Map(val, minY);
-            g.DrawLine(Pens.Black, p.X, bottom - 3, p.X, bottom + 3);
+            var p = Map(val, 0);
+            g.DrawLine(Pens.Black, p.X, p.Y - 3, p.X, p.Y + 3);
             var text = val.ToString("0.0");
             var size = g.MeasureString(text, Font);
-            g.DrawString(text, Font, labelBrush, p.X - size.Width / 2, bottom + 5);
+            g.DrawString(text, Font, labelBrush, p.X - size.Width / 2, p.Y + 5);
         }
 
-        // Y-axis ticks & labels
+        // Y-axis ticks
         int yTicks = 5;
         for (int i = 0; i <= yTicks; i++)
         {
             double val = minY + i * (maxY - minY) / yTicks;
-            var p = Map(minX, val);
-            g.DrawLine(Pens.Black, left - 3, p.Y, left + 3, p.Y);
+            var p = Map(0, val);
+            g.DrawLine(Pens.Black, p.X - 3, p.Y, p.X + 3, p.Y);
             var text = val.ToString("0.0");
             var size = g.MeasureString(text, Font);
-            g.DrawString(text, Font, labelBrush, left - size.Width - 5, p.Y - size.Height / 2);
+            g.DrawString(text, Font, labelBrush, p.X - size.Width - 5, p.Y - size.Height / 2);
         }
 
         // Draw cities

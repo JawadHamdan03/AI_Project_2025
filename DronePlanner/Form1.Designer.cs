@@ -112,11 +112,11 @@
             // 
             dataGridViewResults.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridViewResults.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewResults.Location = new Point(-3, 100);
+            dataGridViewResults.Location = new Point(-11, 117);
             dataGridViewResults.Name = "dataGridViewResults";
             dataGridViewResults.RowHeadersVisible = false;
             dataGridViewResults.RowHeadersWidth = 51;
-            dataGridViewResults.Size = new Size(647, 294);
+            dataGridViewResults.Size = new Size(647, 293);
             dataGridViewResults.TabIndex = 5;
             dataGridViewResults.CellFormatting += dataGridViewResults_CellFormatting;
             // 
@@ -187,7 +187,7 @@
             // numX
             // 
             numX.Location = new Point(763, 14);
-            numX.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numX.Minimum = new decimal(new int[] { 100, 0, 0, int.MinValue });
             numX.Name = "numX";
             numX.Size = new Size(150, 27);
             numX.TabIndex = 13;
@@ -196,7 +196,7 @@
             // numY
             // 
             numY.Location = new Point(763, 69);
-            numY.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numY.Minimum = new decimal(new int[] { 100, 0, 0, int.MinValue });
             numY.Name = "numY";
             numY.Size = new Size(150, 27);
             numY.TabIndex = 14;
@@ -268,9 +268,9 @@
             // 
             // pictureMap
             // 
-            pictureMap.Location = new Point(745, 145);
+            pictureMap.Location = new Point(728, 117);
             pictureMap.Name = "pictureMap";
-            pictureMap.Size = new Size(565, 293);
+            pictureMap.Size = new Size(638, 293);
             pictureMap.TabIndex = 22;
             pictureMap.TabStop = false;
             pictureMap.Paint += pictureMap_Paint;
