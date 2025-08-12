@@ -8,24 +8,43 @@ namespace DronePlanner.Models;
 
 internal class Perceptron
 {
-    private double[] weights { get; set; }
-    private double bias { get; set; }
-    private double learningRate { get; set; }
+    private double[] weights;
+    private double bias;
+    private readonly double learningRate;
+    private static readonly Random rng = new Random(); 
 
-    public Perceptron(int inputSize, double learningRate = 0.1)
+    public Perceptron(int inputSize, double learningRate = 0.1, double[]? initialWeights = null, double? initialBias = null)
     {
         this.learningRate = learningRate;
         weights = new double[inputSize];
-        bias = 0;
+
+        if (initialWeights != null && initialWeights.Length == inputSize)
+        {
+            Array.Copy(initialWeights, weights, inputSize); 
+        }
+        else
+        {
+            
+            for (int i = 0; i < inputSize; i++)
+                weights[i] = rng.NextDouble() - 0.5;
+        }
+
+        if (initialBias.HasValue)
+        {
+            bias = initialBias.Value;
+        }
+        else
+        {
+            
+            bias = rng.NextDouble() - 0.5;
+        }
     }
 
     public int Predict(double[] inputs)
     {
         double sum = bias;
         for (int i = 0; i < weights.Length; i++)
-        {
             sum += weights[i] * inputs[i];
-        }
         return sum >= 0 ? 1 : 0;
     }
 
@@ -38,11 +57,9 @@ internal class Perceptron
                 int prediction = Predict(trainingInputs[i]);
                 int error = labels[i] - prediction;
 
-                //update weights and bias
                 for (int j = 0; j < weights.Length; j++)
-                {
                     weights[j] += learningRate * error * trainingInputs[i][j];
-                }
+
                 bias += learningRate * error;
             }
         }

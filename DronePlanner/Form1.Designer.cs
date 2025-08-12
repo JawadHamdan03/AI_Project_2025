@@ -66,7 +66,7 @@
             btnLoadExcel.BackColor = SystemColors.InactiveCaption;
             btnLoadExcel.FlatStyle = FlatStyle.Flat;
             btnLoadExcel.Font = new Font("Segoe UI Historic", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnLoadExcel.Location = new Point(350, 43);
+            btnLoadExcel.Location = new Point(350, 41);
             btnLoadExcel.Name = "btnLoadExcel";
             btnLoadExcel.Size = new Size(166, 29);
             btnLoadExcel.TabIndex = 0;
@@ -108,11 +108,11 @@
             btnPredict.BackColor = SystemColors.Info;
             btnPredict.Enabled = false;
             btnPredict.FlatStyle = FlatStyle.Popup;
-            btnPredict.Location = new Point(542, 43);
+            btnPredict.Location = new Point(546, 132);
             btnPredict.Name = "btnPredict";
             btnPredict.Size = new Size(94, 29);
             btnPredict.TabIndex = 4;
-            btnPredict.Text = "Predict ";
+            btnPredict.Text = "Test";
             btnPredict.UseVisualStyleBackColor = false;
             btnPredict.Click += btnPredict_Click;
             // 
@@ -150,7 +150,7 @@
             // 
             btnClear.BackColor = Color.Red;
             btnClear.FlatStyle = FlatStyle.Popup;
-            btnClear.Location = new Point(542, 129);
+            btnClear.Location = new Point(546, 41);
             btnClear.Name = "btnClear";
             btnClear.Size = new Size(94, 29);
             btnClear.TabIndex = 8;
