@@ -63,24 +63,27 @@
             // 
             // btnLoadExcel
             // 
-            btnLoadExcel.Location = new Point(350, 12);
+            btnLoadExcel.BackColor = SystemColors.InactiveCaption;
+            btnLoadExcel.FlatStyle = FlatStyle.Flat;
+            btnLoadExcel.Font = new Font("Segoe UI Historic", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btnLoadExcel.Location = new Point(350, 43);
             btnLoadExcel.Name = "btnLoadExcel";
             btnLoadExcel.Size = new Size(166, 29);
             btnLoadExcel.TabIndex = 0;
             btnLoadExcel.Text = "Load Data";
-            btnLoadExcel.UseVisualStyleBackColor = true;
+            btnLoadExcel.UseVisualStyleBackColor = false;
             btnLoadExcel.Click += btnLoadExcel_Click;
             // 
             // txtLearningRate
             // 
-            txtLearningRate.Location = new Point(118, 12);
+            txtLearningRate.Location = new Point(118, 43);
             txtLearningRate.Name = "txtLearningRate";
             txtLearningRate.Size = new Size(150, 27);
             txtLearningRate.TabIndex = 1;
             // 
             // numEpochs
             // 
-            numEpochs.Location = new Point(118, 67);
+            numEpochs.Location = new Point(118, 131);
             numEpochs.Maximum = new decimal(new int[] { 2000, 0, 0, 0 });
             numEpochs.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numEpochs.Name = "numEpochs";
@@ -90,40 +93,44 @@
             // 
             // btnTrain
             // 
-            btnTrain.Location = new Point(350, 67);
+            btnTrain.BackColor = SystemColors.InactiveCaption;
+            btnTrain.FlatStyle = FlatStyle.Flat;
+            btnTrain.Location = new Point(350, 131);
             btnTrain.Name = "btnTrain";
             btnTrain.Size = new Size(166, 29);
             btnTrain.TabIndex = 3;
             btnTrain.Text = "Train";
-            btnTrain.UseVisualStyleBackColor = true;
+            btnTrain.UseVisualStyleBackColor = false;
             btnTrain.Click += btnTrain_Click;
             // 
             // btnPredict
             // 
-            btnPredict.Location = new Point(542, 12);
+            btnPredict.BackColor = SystemColors.Info;
+            btnPredict.FlatStyle = FlatStyle.Popup;
+            btnPredict.Location = new Point(542, 43);
             btnPredict.Name = "btnPredict";
             btnPredict.Size = new Size(94, 29);
             btnPredict.TabIndex = 4;
             btnPredict.Text = "Predict ";
-            btnPredict.UseVisualStyleBackColor = true;
+            btnPredict.UseVisualStyleBackColor = false;
             btnPredict.Click += btnPredict_Click;
             // 
             // dataGridViewResults
             // 
             dataGridViewResults.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridViewResults.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewResults.Location = new Point(-11, 117);
+            dataGridViewResults.Location = new Point(12, 237);
             dataGridViewResults.Name = "dataGridViewResults";
             dataGridViewResults.RowHeadersVisible = false;
             dataGridViewResults.RowHeadersWidth = 51;
-            dataGridViewResults.Size = new Size(647, 293);
+            dataGridViewResults.Size = new Size(624, 293);
             dataGridViewResults.TabIndex = 5;
             dataGridViewResults.CellFormatting += dataGridViewResults_CellFormatting;
             // 
             // lblStatus
             // 
             lblStatus.AutoSize = true;
-            lblStatus.Location = new Point(27, 433);
+            lblStatus.Location = new Point(27, 564);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(50, 20);
             lblStatus.TabIndex = 6;
@@ -132,26 +139,28 @@
             // lblAccuracy
             // 
             lblAccuracy.AutoSize = true;
-            lblAccuracy.Location = new Point(448, 433);
+            lblAccuracy.Location = new Point(441, 564);
             lblAccuracy.Name = "lblAccuracy";
-            lblAccuracy.Size = new Size(68, 20);
+            lblAccuracy.Size = new Size(75, 20);
             lblAccuracy.TabIndex = 7;
-            lblAccuracy.Text = "Accuracy";
+            lblAccuracy.Text = "Accuracy :";
             // 
             // btnClear
             // 
-            btnClear.Location = new Point(542, 65);
+            btnClear.BackColor = Color.Red;
+            btnClear.FlatStyle = FlatStyle.Popup;
+            btnClear.Location = new Point(542, 129);
             btnClear.Name = "btnClear";
             btnClear.Size = new Size(94, 29);
             btnClear.TabIndex = 8;
             btnClear.Text = "Clear";
-            btnClear.UseVisualStyleBackColor = true;
+            btnClear.UseVisualStyleBackColor = false;
             btnClear.Click += btnClear_Click;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(12, 15);
+            label1.Location = new Point(12, 46);
             label1.Name = "label1";
             label1.Size = new Size(100, 20);
             label1.TabIndex = 9;
@@ -160,7 +169,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(12, 69);
+            label2.Location = new Point(12, 133);
             label2.Name = "label2";
             label2.Size = new Size(65, 20);
             label2.TabIndex = 10;
@@ -169,7 +178,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(728, 14);
+            label3.Location = new Point(728, 39);
             label3.Name = "label3";
             label3.Size = new Size(29, 20);
             label3.TabIndex = 11;
@@ -178,7 +187,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(728, 69);
+            label4.Location = new Point(728, 129);
             label4.Name = "label4";
             label4.Size = new Size(24, 20);
             label4.TabIndex = 12;
@@ -186,7 +195,7 @@
             // 
             // numX
             // 
-            numX.Location = new Point(763, 14);
+            numX.Location = new Point(763, 39);
             numX.Minimum = new decimal(new int[] { 100, 0, 0, int.MinValue });
             numX.Name = "numX";
             numX.Size = new Size(150, 27);
@@ -195,7 +204,7 @@
             // 
             // numY
             // 
-            numY.Location = new Point(763, 69);
+            numY.Location = new Point(763, 129);
             numY.Minimum = new decimal(new int[] { 100, 0, 0, int.MinValue });
             numY.Name = "numY";
             numY.Size = new Size(150, 27);
@@ -204,7 +213,7 @@
             // 
             // numHumidity
             // 
-            numHumidity.Location = new Point(1008, 69);
+            numHumidity.Location = new Point(1008, 129);
             numHumidity.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numHumidity.Name = "numHumidity";
             numHumidity.Size = new Size(150, 27);
@@ -213,7 +222,7 @@
             // 
             // numTemp
             // 
-            numTemp.Location = new Point(1008, 14);
+            numTemp.Location = new Point(1008, 39);
             numTemp.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numTemp.Name = "numTemp";
             numTemp.Size = new Size(150, 27);
@@ -223,7 +232,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(973, 69);
+            label5.Location = new Point(973, 129);
             label5.Name = "label5";
             label5.Size = new Size(27, 20);
             label5.TabIndex = 16;
@@ -232,7 +241,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(973, 14);
+            label6.Location = new Point(973, 39);
             label6.Name = "label6";
             label6.Size = new Size(24, 20);
             label6.TabIndex = 15;
@@ -240,7 +249,7 @@
             // 
             // numWind
             // 
-            numWind.Location = new Point(1216, 14);
+            numWind.Location = new Point(1216, 39);
             numWind.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numWind.Name = "numWind";
             numWind.Size = new Size(150, 27);
@@ -250,7 +259,7 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(1181, 14);
+            label7.Location = new Point(1181, 39);
             label7.Name = "label7";
             label7.Size = new Size(30, 20);
             label7.TabIndex = 19;
@@ -258,17 +267,19 @@
             // 
             // btnAddCity
             // 
-            btnAddCity.Location = new Point(1216, 69);
+            btnAddCity.BackColor = SystemColors.ScrollBar;
+            btnAddCity.FlatStyle = FlatStyle.Popup;
+            btnAddCity.Location = new Point(1216, 129);
             btnAddCity.Name = "btnAddCity";
             btnAddCity.Size = new Size(150, 29);
             btnAddCity.TabIndex = 21;
             btnAddCity.Text = "Add City";
-            btnAddCity.UseVisualStyleBackColor = true;
+            btnAddCity.UseVisualStyleBackColor = false;
             btnAddCity.Click += btnAddCity_Click;
             // 
             // pictureMap
             // 
-            pictureMap.Location = new Point(728, 117);
+            pictureMap.Location = new Point(728, 237);
             pictureMap.Name = "pictureMap";
             pictureMap.Size = new Size(638, 293);
             pictureMap.TabIndex = 22;
@@ -279,7 +290,8 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1394, 473);
+            BackColor = SystemColors.ActiveCaption;
+            ClientSize = new Size(1394, 670);
             Controls.Add(pictureMap);
             Controls.Add(btnAddCity);
             Controls.Add(numWind);
