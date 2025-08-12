@@ -37,13 +37,33 @@
             lblStatus = new Label();
             lblAccuracy = new Label();
             btnClear = new Button();
+            label1 = new Label();
+            label2 = new Label();
+            label3 = new Label();
+            label4 = new Label();
+            numX = new NumericUpDown();
+            numY = new NumericUpDown();
+            numHumidity = new NumericUpDown();
+            numTemp = new NumericUpDown();
+            label5 = new Label();
+            label6 = new Label();
+            numWind = new NumericUpDown();
+            label7 = new Label();
+            btnAddCity = new Button();
+            pictureMap = new PictureBox();
             ((System.ComponentModel.ISupportInitialize)numEpochs).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridViewResults).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numX).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numY).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numHumidity).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numTemp).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numWind).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureMap).BeginInit();
             SuspendLayout();
             // 
             // btnLoadExcel
             // 
-            btnLoadExcel.Location = new Point(12, 19);
+            btnLoadExcel.Location = new Point(350, 12);
             btnLoadExcel.Name = "btnLoadExcel";
             btnLoadExcel.Size = new Size(166, 29);
             btnLoadExcel.TabIndex = 0;
@@ -53,15 +73,15 @@
             // 
             // txtLearningRate
             // 
-            txtLearningRate.Location = new Point(223, 22);
+            txtLearningRate.Location = new Point(118, 12);
             txtLearningRate.Name = "txtLearningRate";
-            txtLearningRate.Size = new Size(125, 27);
+            txtLearningRate.Size = new Size(150, 27);
             txtLearningRate.TabIndex = 1;
             // 
             // numEpochs
             // 
-            numEpochs.Location = new Point(394, 19);
-            numEpochs.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numEpochs.Location = new Point(118, 67);
+            numEpochs.Maximum = new decimal(new int[] { 2000, 0, 0, 0 });
             numEpochs.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numEpochs.Name = "numEpochs";
             numEpochs.Size = new Size(150, 27);
@@ -70,9 +90,9 @@
             // 
             // btnTrain
             // 
-            btnTrain.Location = new Point(719, 17);
+            btnTrain.Location = new Point(350, 67);
             btnTrain.Name = "btnTrain";
-            btnTrain.Size = new Size(94, 29);
+            btnTrain.Size = new Size(166, 29);
             btnTrain.TabIndex = 3;
             btnTrain.Text = "Train";
             btnTrain.UseVisualStyleBackColor = true;
@@ -80,7 +100,7 @@
             // 
             // btnPredict
             // 
-            btnPredict.Location = new Point(835, 17);
+            btnPredict.Location = new Point(542, 12);
             btnPredict.Name = "btnPredict";
             btnPredict.Size = new Size(94, 29);
             btnPredict.TabIndex = 4;
@@ -96,14 +116,14 @@
             dataGridViewResults.Name = "dataGridViewResults";
             dataGridViewResults.RowHeadersVisible = false;
             dataGridViewResults.RowHeadersWidth = 51;
-            dataGridViewResults.Size = new Size(1393, 294);
+            dataGridViewResults.Size = new Size(647, 294);
             dataGridViewResults.TabIndex = 5;
             dataGridViewResults.CellFormatting += dataGridViewResults_CellFormatting;
             // 
             // lblStatus
             // 
             lblStatus.AutoSize = true;
-            lblStatus.Location = new Point(154, 433);
+            lblStatus.Location = new Point(27, 433);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(50, 20);
             lblStatus.TabIndex = 6;
@@ -112,7 +132,7 @@
             // lblAccuracy
             // 
             lblAccuracy.AutoSize = true;
-            lblAccuracy.Location = new Point(745, 433);
+            lblAccuracy.Location = new Point(448, 433);
             lblAccuracy.Name = "lblAccuracy";
             lblAccuracy.Size = new Size(68, 20);
             lblAccuracy.TabIndex = 7;
@@ -120,7 +140,7 @@
             // 
             // btnClear
             // 
-            btnClear.Location = new Point(960, 20);
+            btnClear.Location = new Point(542, 65);
             btnClear.Name = "btnClear";
             btnClear.Size = new Size(94, 29);
             btnClear.TabIndex = 8;
@@ -128,11 +148,152 @@
             btnClear.UseVisualStyleBackColor = true;
             btnClear.Click += btnClear_Click;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(12, 15);
+            label1.Name = "label1";
+            label1.Size = new Size(100, 20);
+            label1.TabIndex = 9;
+            label1.Text = "Learning Rate";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(12, 69);
+            label2.Name = "label2";
+            label2.Size = new Size(65, 20);
+            label2.TabIndex = 10;
+            label2.Text = "#Epochs";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(728, 14);
+            label3.Name = "label3";
+            label3.Size = new Size(29, 20);
+            label3.TabIndex = 11;
+            label3.Text = "X : ";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(728, 69);
+            label4.Name = "label4";
+            label4.Size = new Size(24, 20);
+            label4.TabIndex = 12;
+            label4.Text = "Y :";
+            // 
+            // numX
+            // 
+            numX.Location = new Point(763, 14);
+            numX.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numX.Name = "numX";
+            numX.Size = new Size(150, 27);
+            numX.TabIndex = 13;
+            numX.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // numY
+            // 
+            numY.Location = new Point(763, 69);
+            numY.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numY.Name = "numY";
+            numY.Size = new Size(150, 27);
+            numY.TabIndex = 14;
+            numY.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // numHumidity
+            // 
+            numHumidity.Location = new Point(1008, 69);
+            numHumidity.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numHumidity.Name = "numHumidity";
+            numHumidity.Size = new Size(150, 27);
+            numHumidity.TabIndex = 18;
+            numHumidity.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // numTemp
+            // 
+            numTemp.Location = new Point(1008, 14);
+            numTemp.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numTemp.Name = "numTemp";
+            numTemp.Size = new Size(150, 27);
+            numTemp.TabIndex = 17;
+            numTemp.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(973, 69);
+            label5.Name = "label5";
+            label5.Size = new Size(27, 20);
+            label5.TabIndex = 16;
+            label5.Text = "H :";
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Location = new Point(973, 14);
+            label6.Name = "label6";
+            label6.Size = new Size(24, 20);
+            label6.TabIndex = 15;
+            label6.Text = "T :";
+            // 
+            // numWind
+            // 
+            numWind.Location = new Point(1216, 14);
+            numWind.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numWind.Name = "numWind";
+            numWind.Size = new Size(150, 27);
+            numWind.TabIndex = 20;
+            numWind.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(1181, 14);
+            label7.Name = "label7";
+            label7.Size = new Size(30, 20);
+            label7.TabIndex = 19;
+            label7.Text = "W :";
+            // 
+            // btnAddCity
+            // 
+            btnAddCity.Location = new Point(1216, 69);
+            btnAddCity.Name = "btnAddCity";
+            btnAddCity.Size = new Size(150, 29);
+            btnAddCity.TabIndex = 21;
+            btnAddCity.Text = "Add City";
+            btnAddCity.UseVisualStyleBackColor = true;
+            btnAddCity.Click += btnAddCity_Click;
+            // 
+            // pictureMap
+            // 
+            pictureMap.Location = new Point(745, 145);
+            pictureMap.Name = "pictureMap";
+            pictureMap.Size = new Size(565, 293);
+            pictureMap.TabIndex = 22;
+            pictureMap.TabStop = false;
+            pictureMap.Paint += pictureMap_Paint;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1394, 473);
+            Controls.Add(pictureMap);
+            Controls.Add(btnAddCity);
+            Controls.Add(numWind);
+            Controls.Add(label7);
+            Controls.Add(numHumidity);
+            Controls.Add(numTemp);
+            Controls.Add(label5);
+            Controls.Add(label6);
+            Controls.Add(numY);
+            Controls.Add(numX);
+            Controls.Add(label4);
+            Controls.Add(label3);
+            Controls.Add(label2);
+            Controls.Add(label1);
             Controls.Add(btnClear);
             Controls.Add(lblAccuracy);
             Controls.Add(lblStatus);
@@ -146,6 +307,12 @@
             Text = "Drone Planner";
             ((System.ComponentModel.ISupportInitialize)numEpochs).EndInit();
             ((System.ComponentModel.ISupportInitialize)dataGridViewResults).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numX).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numY).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numHumidity).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numTemp).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numWind).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureMap).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -161,5 +328,19 @@
         private Label lblStatus;
         private Label lblAccuracy;
         private Button btnClear;
+        private Label label1;
+        private Label label2;
+        private Label label3;
+        private Label label4;
+        private NumericUpDown numX;
+        private NumericUpDown numY;
+        private NumericUpDown numHumidity;
+        private NumericUpDown numTemp;
+        private Label label5;
+        private Label label6;
+        private NumericUpDown numWind;
+        private Label label7;
+        private Button btnAddCity;
+        private PictureBox pictureMap;
     }
 }
