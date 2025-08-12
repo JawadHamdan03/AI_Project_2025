@@ -12,7 +12,7 @@ internal class Perceptron
     private double bias;
     private double learningRate;
 
-    public Perceptron(int inputSize, double learningRate = 0.01)
+    public Perceptron(int inputSize, double learningRate = 0.1)
     {
         this.learningRate = learningRate;
         weights = new double[inputSize];
