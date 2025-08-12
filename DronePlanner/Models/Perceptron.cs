@@ -8,9 +8,9 @@ namespace DronePlanner.Models;
 
 internal class Perceptron
 {
-    private double[] weights;
-    private double bias;
-    private double learningRate;
+    private double[] weights { get; set; }
+    private double bias { get; set; }
+    private double learningRate { get; set; }
 
     public Perceptron(int inputSize, double learningRate = 0.1)
     {

@@ -106,6 +106,7 @@
             // btnPredict
             // 
             btnPredict.BackColor = SystemColors.Info;
+            btnPredict.Enabled = false;
             btnPredict.FlatStyle = FlatStyle.Popup;
             btnPredict.Location = new Point(542, 43);
             btnPredict.Name = "btnPredict";
@@ -123,14 +124,14 @@
             dataGridViewResults.Name = "dataGridViewResults";
             dataGridViewResults.RowHeadersVisible = false;
             dataGridViewResults.RowHeadersWidth = 51;
-            dataGridViewResults.Size = new Size(624, 293);
+            dataGridViewResults.Size = new Size(682, 407);
             dataGridViewResults.TabIndex = 5;
             dataGridViewResults.CellFormatting += dataGridViewResults_CellFormatting;
             // 
             // lblStatus
             // 
             lblStatus.AutoSize = true;
-            lblStatus.Location = new Point(27, 564);
+            lblStatus.Location = new Point(12, 205);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(50, 20);
             lblStatus.TabIndex = 6;
@@ -139,7 +140,7 @@
             // lblAccuracy
             // 
             lblAccuracy.AutoSize = true;
-            lblAccuracy.Location = new Point(441, 564);
+            lblAccuracy.Location = new Point(441, 205);
             lblAccuracy.Name = "lblAccuracy";
             lblAccuracy.Size = new Size(75, 20);
             lblAccuracy.TabIndex = 7;
@@ -267,7 +268,7 @@
             // 
             // btnAddCity
             // 
-            btnAddCity.BackColor = SystemColors.ScrollBar;
+            btnAddCity.BackColor = Color.OliveDrab;
             btnAddCity.FlatStyle = FlatStyle.Popup;
             btnAddCity.Location = new Point(1216, 129);
             btnAddCity.Name = "btnAddCity";
@@ -281,7 +282,7 @@
             // 
             pictureMap.Location = new Point(728, 237);
             pictureMap.Name = "pictureMap";
-            pictureMap.Size = new Size(638, 293);
+            pictureMap.Size = new Size(654, 407);
             pictureMap.TabIndex = 22;
             pictureMap.TabStop = false;
             pictureMap.Paint += pictureMap_Paint;

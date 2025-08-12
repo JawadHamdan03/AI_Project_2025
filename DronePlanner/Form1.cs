@@ -9,14 +9,14 @@ public partial class Form1 : Form
     private double[][]? _inputs;
     private int[]? _labels;
     private Perceptron? _model;
-    private List<City> _cities = new();
+    private List<City> _cities = new List<City>();
     private double[,]? _costMatrix;
     private const int MapPadding = 30;
     public Form1()
     {
         InitializeComponent();
     }
-
+    //---------------------------part1-----------------------------------------
     private void btnLoadExcel_Click(object sender, EventArgs e)
     {
         using var ofd = new OpenFileDialog
@@ -74,11 +74,11 @@ public partial class Form1 : Form
 
             _model = new Perceptron(3, lr);
 
-            // run training in background so UI stays responsive
+            
             await Task.Run(() => _model.Train(_inputs, _labels, epochs));
 
             lblStatus.Text = "Training complete.";
-            btnPredict.Enabled = true; // allow prediction
+            btnPredict.Enabled = true; 
         }
         catch (Exception ex)
         {
@@ -155,8 +155,8 @@ public partial class Form1 : Form
         lblAccuracy.Text = "Accuracy: —";
 
 
-        txtLearningRate.Text = "0.01";
-        numEpochs.Value = 100;
+        txtLearningRate.Text = "0.1";
+        numEpochs.Value = 1;
 
 
         btnTrain.Enabled = false;
@@ -173,17 +173,17 @@ public partial class Form1 : Form
             return;
         }
 
-        // Gather input values
+        
         double x = (double)numX.Value;
         double y = (double)numY.Value;
         double temp = (double)numTemp.Value;
         double humidity = (double)numHumidity.Value;
         double wind = (double)numWind.Value;
 
-        // Predict Safe/Unsafe using the perceptron
+        
         int prediction = _model.Predict(new double[] { temp, humidity, wind });
 
-        // Add city to list
+        
         var city = new City
         {
             Id = _cities.Count + 1,
@@ -196,7 +196,7 @@ public partial class Form1 : Form
         };
         _cities.Add(city);
 
-        // Refresh grid
+        
         var table = new DataTable();
         table.Columns.Add("ID", typeof(int));
         table.Columns.Add("X", typeof(double));
@@ -211,10 +211,16 @@ public partial class Form1 : Form
 
         dataGridViewResults.DataSource = table;
 
-        // Color unsafe rows red
+        
         dataGridViewResults.CellFormatting -= CityCellFormatting;
         dataGridViewResults.CellFormatting += CityCellFormatting;
         pictureMap.Invalidate();
+
+        numX.ResetText();
+        numY.ResetText();
+        numTemp.ResetText();
+        numHumidity.ResetText();
+        numWind.ResetText();
     }
 
     private void CityCellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
@@ -230,44 +236,22 @@ public partial class Form1 : Form
         }
     }
 
-    //----------------drawing cities--------------
+    //--------graphing cities----
     private (double minX, double maxX, double minY, double maxY) GetWorldBounds()
     {
-        if (_cities.Count == 0) return (0, 100, 0, 100); // default view
+        if (_cities.Count == 0) return (0, 100, 0, 100); 
 
         double minX = _cities.Min(c => c.X);
         double maxX = _cities.Max(c => c.X);
         double minY = _cities.Min(c => c.Y);
         double maxY = _cities.Max(c => c.Y);
 
-        // Add a little margin
+        
         double dx = Math.Max(1, (maxX - minX) * 0.05);
         double dy = Math.Max(1, (maxY - minY) * 0.05);
         return (minX - dx, maxX + dx, minY - dy, maxY + dy);
     }
-
-    private PointF WorldToScreen(double x, double y, Rectangle clientRect)
-    {
-        var (minX, maxX, minY, maxY) = GetWorldBounds();
-
-       
-        int left = clientRect.Left + MapPadding;
-        int right = clientRect.Right - MapPadding;
-        int top = clientRect.Top + MapPadding;
-        int bottom = clientRect.Bottom - MapPadding;
-
-        float width = Math.Max(1, right - left);
-        float height = Math.Max(1, bottom - top);
-
-        double sx = (maxX - minX) == 0 ? 0.5 : (x - minX) / (maxX - minX);
-        double sy = (maxY - minY) == 0 ? 0.5 : (y - minY) / (maxY - minY);
-
-        
-        float px = left + (float)(sx * width);
-        float py = bottom - (float)(sy * height);
-
-        return new PointF(px, py);
-    }
+    
     private void pictureMap_Paint(object sender, PaintEventArgs e)
     {
         var g = e.Graphics;
@@ -285,18 +269,18 @@ public partial class Form1 : Form
             return;
         }
 
-        // Get bounds from cities
+       
         double minX = _cities.Min(c => c.X);
         double maxX = _cities.Max(c => c.X);
         double minY = _cities.Min(c => c.Y);
         double maxY = _cities.Max(c => c.Y);
 
-        // Expand bounds slightly
+        
         double dx = Math.Max(1, (maxX - minX) * 0.05);
         double dy = Math.Max(1, (maxY - minY) * 0.05);
         minX -= dx; maxX += dx; minY -= dy; maxY += dy;
 
-        // Make sure (0,0) is inside the bounds for axis crossing
+        
         if (minX > 0) minX = 0;
         if (maxX < 0) maxX = 0;
         if (minY > 0) minY = 0;
@@ -314,20 +298,20 @@ public partial class Form1 : Form
             double sx = (x - minX) / (maxX - minX);
             double sy = (y - minY) / (maxY - minY);
             float px = left + (float)(sx * width);
-            float py = bottom - (float)(sy * height); // invert Y
+            float py = bottom - (float)(sy * height); 
             return new PointF(px, py);
         }
 
         using var axisPen = new Pen(Color.Black, 1);
 
-        // X-axis at Y=0
+       
         if (minY <= 0 && maxY >= 0)
         {
             var y0 = Map(0, 0).Y;
             g.DrawLine(axisPen, left, y0, right, y0);
         }
 
-        // Y-axis at X=0
+        
         if (minX <= 0 && maxX >= 0)
         {
             var x0 = Map(0, 0).X;
@@ -336,7 +320,7 @@ public partial class Form1 : Form
 
         using var labelBrush = new SolidBrush(Color.Black);
 
-        // X-axis ticks
+       
         int xTicks = 5;
         for (int i = 0; i <= xTicks; i++)
         {
@@ -348,7 +332,7 @@ public partial class Form1 : Form
             g.DrawString(text, Font, labelBrush, p.X - size.Width / 2, p.Y + 5);
         }
 
-        // Y-axis ticks
+        
         int yTicks = 5;
         for (int i = 0; i <= yTicks; i++)
         {
@@ -360,7 +344,7 @@ public partial class Form1 : Form
             g.DrawString(text, Font, labelBrush, p.X - size.Width - 5, p.Y - size.Height / 2);
         }
 
-        // Draw cities
+        
         using var safeBrush = new SolidBrush(Color.FromArgb(60, 180, 75));
         using var unsafeBrush = new SolidBrush(Color.FromArgb(240, 80, 80));
         using var textBrush = new SolidBrush(Color.Black);
@@ -377,5 +361,5 @@ public partial class Form1 : Form
         }
     }
 
-    //----------------part3----------------------------
+    //----------------------------part3-------------------------------------------
 }
