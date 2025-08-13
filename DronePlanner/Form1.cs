@@ -46,10 +46,10 @@ public partial class Form1 : Form
         {
             DataLoader.LoadData(ofd.FileName, out Inputs!, out Labels!);
             lblStatus.Text = $"Loaded {Inputs.Length} rows from {Path.GetFileName(ofd.FileName)}";
-            btnTrain.Enabled = Inputs.Length > 0;   
-            btnPredict.Enabled = false;              
+            btnTrain.Enabled = Inputs.Length > 0;
+            btnPredict.Enabled = false;
             lblAccuracy.Text = "Accuracy: —";
-            dataGridViewResults.DataSource = null;   
+            dataGridViewResults.DataSource = null;
         }
         catch (Exception ex)
         {
@@ -59,7 +59,7 @@ public partial class Form1 : Form
         }
     }
 
-    private  void btnTrain_Click(object sender, EventArgs e)
+    private void btnTrain_Click(object sender, EventArgs e)
     {
         if (Inputs == null || Labels == null || Inputs.Length == 0)
         {
@@ -120,13 +120,13 @@ public partial class Form1 : Form
         }
 
         var table = new DataTable();
-        table.Columns.Add("Row", typeof(int));          
+        table.Columns.Add("Row", typeof(int));
         table.Columns.Add("Temperature", typeof(double));
         table.Columns.Add("Humidity", typeof(double));
         table.Columns.Add("Wind", typeof(double));
         table.Columns.Add("Actual", typeof(int));
         table.Columns.Add("Predicted", typeof(int));
-        table.Columns.Add("Correct", typeof(string));   
+        table.Columns.Add("Correct", typeof(string));
 
         int tp = 0, tn = 0, fp = 0, fn = 0;
 
@@ -141,19 +141,19 @@ public partial class Form1 : Form
             else if (pred == 0 && actual == 1) fn++;
 
             string correct = (pred == actual) ? "✓" : "✗";
-            int originalRow = _testIdx[i] + 2; 
+            int originalRow = _testIdx[i] + 2;
 
             table.Rows.Add(originalRow, _xTest[i][0], _xTest[i][1], _xTest[i][2], actual, pred, correct);
         }
 
         dataGridViewResults.DataSource = table;
         dataGridViewResults.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-        
+
         dataGridViewResults.CellFormatting -= dataGridViewResults_CellFormatting;
         dataGridViewResults.CellFormatting += dataGridViewResults_CellFormatting;
 
         double acc = (_xTest.Length > 0) ? (double)(tp + tn) / _xTest.Length : 0.0;
-        double precision = (tp + fp) > 0 ? (double)tp / (tp + fp) : 0.0; 
+        double precision = (tp + fp) > 0 ? (double)tp / (tp + fp) : 0.0;
         double recall = (tp + fn) > 0 ? (double)tp / (tp + fn) : 0.0;
 
         lblAccuracy.Text = $"Test (20%) Accuracy: {acc:P2}";
@@ -202,7 +202,7 @@ public partial class Form1 : Form
     }
 
 
-    private static (double[][] X, int[] y) BuildSubset( double[][] X, int[] y, int[] idx, int start, int count)
+    private static (double[][] X, int[] y) BuildSubset(double[][] X, int[] y, int[] idx, int start, int count)
     {
         var subX = new double[count][];
         var subY = new int[count];
@@ -228,17 +228,17 @@ public partial class Form1 : Form
             return;
         }
 
-        
+
         double x = (double)numX.Value;
         double y = (double)numY.Value;
         double temp = (double)numTemp.Value;
         double humidity = (double)numHumidity.Value;
         double wind = (double)numWind.Value;
 
-        
+
         int prediction = Classifier.Predict(new double[] { temp, humidity, wind });
 
-        
+
         var city = new City
         {
             Id = _cities.Count + 1,
@@ -251,7 +251,7 @@ public partial class Form1 : Form
         };
         _cities.Add(city);
 
-        
+
         var table = new DataTable();
         table.Columns.Add("ID", typeof(int));
         table.Columns.Add("X", typeof(double));
@@ -266,7 +266,7 @@ public partial class Form1 : Form
 
         dataGridViewResults.DataSource = table;
 
-        
+
         dataGridViewResults.CellFormatting -= CityCellFormatting;
         dataGridViewResults.CellFormatting += CityCellFormatting;
         pictureMap.Invalidate();
@@ -300,6 +300,7 @@ public partial class Form1 : Form
         using (var borderPen = new Pen(Color.LightGray, 1))
             g.DrawRectangle(borderPen, rect.Left + 1, rect.Top + 1, rect.Width - 2, rect.Height - 2);
 
+        // Empty state
         if (_cities == null || _cities.Count == 0)
         {
             using var hintBrush = new SolidBrush(Color.Gray);
@@ -308,18 +309,17 @@ public partial class Form1 : Form
             return;
         }
 
-       
+        // World bounds from cities (+margin)
         double minX = _cities.Min(c => c.X);
         double maxX = _cities.Max(c => c.X);
         double minY = _cities.Min(c => c.Y);
         double maxY = _cities.Max(c => c.Y);
 
-        
         double dx = Math.Max(1, (maxX - minX) * 0.05);
         double dy = Math.Max(1, (maxY - minY) * 0.05);
         minX -= dx; maxX += dx; minY -= dy; maxY += dy;
 
-        
+        // Ensure (0,0) axes can appear
         if (minX > 0) minX = 0;
         if (maxX < 0) maxX = 0;
         if (minY > 0) minY = 0;
@@ -337,53 +337,54 @@ public partial class Form1 : Form
             double sx = (x - minX) / (maxX - minX);
             double sy = (y - minY) / (maxY - minY);
             float px = left + (float)(sx * width);
-            float py = bottom - (float)(sy * height); 
+            float py = bottom - (float)(sy * height); // invert Y
             return new PointF(px, py);
         }
 
-        using var axisPen = new Pen(Color.Black, 1);
-
-       
-        if (minY <= 0 && maxY >= 0)
+        // Axes through (0,0) if visible
+        using (var axisPen = new Pen(Color.Black, 1))
         {
-            var y0 = Map(0, 0).Y;
-            g.DrawLine(axisPen, left, y0, right, y0);
+            if (minY <= 0 && maxY >= 0)
+            {
+                var y0 = Map(0, 0).Y;
+                g.DrawLine(axisPen, left, y0, right, y0);
+            }
+            if (minX <= 0 && maxX >= 0)
+            {
+                var x0 = Map(0, 0).X;
+                g.DrawLine(axisPen, x0, top, x0, bottom);
+            }
         }
 
-        
-        if (minX <= 0 && maxX >= 0)
+        // Ticks & labels
+        using (var labelBrush = new SolidBrush(Color.Black))
         {
-            var x0 = Map(0, 0).X;
-            g.DrawLine(axisPen, x0, top, x0, bottom);
+            int xTicks = 5;
+            double tickYValue = (minY <= 0 && maxY >= 0) ? 0 : minY; // place ticks on axis if visible, else on bottom
+            for (int i = 0; i <= xTicks; i++)
+            {
+                double val = minX + i * (maxX - minX) / xTicks;
+                var p = Map(val, tickYValue);
+                g.DrawLine(Pens.Black, p.X, p.Y - 3, p.X, p.Y + 3);
+                var text = val.ToString("0.0");
+                var size = g.MeasureString(text, Font);
+                g.DrawString(text, Font, labelBrush, p.X - size.Width / 2, p.Y + 5);
+            }
+
+            int yTicks = 5;
+            double tickXValue = (minX <= 0 && maxX >= 0) ? 0 : minX; // place ticks on axis if visible, else on left
+            for (int i = 0; i <= yTicks; i++)
+            {
+                double val = minY + i * (maxY - minY) / yTicks;
+                var p = Map(tickXValue, val);
+                g.DrawLine(Pens.Black, p.X - 3, p.Y, p.X + 3, p.Y);
+                var text = val.ToString("0.0");
+                var size = g.MeasureString(text, Font);
+                g.DrawString(text, Font, labelBrush, p.X - size.Width - 5, p.Y - size.Height / 2);
+            }
         }
 
-        using var labelBrush = new SolidBrush(Color.Black);
-
-       
-        int xTicks = 5;
-        for (int i = 0; i <= xTicks; i++)
-        {
-            double val = minX + i * (maxX - minX) / xTicks;
-            var p = Map(val, 0);
-            g.DrawLine(Pens.Black, p.X, p.Y - 3, p.X, p.Y + 3);
-            var text = val.ToString("0.0");
-            var size = g.MeasureString(text, Font);
-            g.DrawString(text, Font, labelBrush, p.X - size.Width / 2, p.Y + 5);
-        }
-
-        
-        int yTicks = 5;
-        for (int i = 0; i <= yTicks; i++)
-        {
-            double val = minY + i * (maxY - minY) / yTicks;
-            var p = Map(0, val);
-            g.DrawLine(Pens.Black, p.X - 3, p.Y, p.X + 3, p.Y);
-            var text = val.ToString("0.0");
-            var size = g.MeasureString(text, Font);
-            g.DrawString(text, Font, labelBrush, p.X - size.Width - 5, p.Y - size.Height / 2);
-        }
-
-        
+        // Cities
         using var safeBrush = new SolidBrush(Color.FromArgb(60, 180, 75));
         using var unsafeBrush = new SolidBrush(Color.FromArgb(240, 80, 80));
         using var textBrush = new SolidBrush(Color.Black);
@@ -398,10 +399,77 @@ public partial class Form1 : Form
             g.DrawEllipse(Pens.Black, p.X - R, p.Y - R, R * 2, R * 2);
             g.DrawString($"C{c.Id}", this.Font, textBrush, p.X + R + 3, p.Y - (R + 3));
         }
+
+        // ===== draw best route (if available) =====
+        if (_bestRoute != null && _bestRoute.Length >= 2)
+        {
+            using var routePen = new Pen(Color.RoyalBlue, 2f);
+            using var routeGlow = new Pen(Color.FromArgb(80, 65, 105, 225), 6f); // soft outer stroke
+
+            PointF Pt(int idx) => Map(_cities[idx].X, _cities[idx].Y);
+
+            // glow underlay
+            for (int k = 0; k < _bestRoute.Length - 1; k++)
+            {
+                var a = Pt(_bestRoute[k]);
+                var b = Pt(_bestRoute[k + 1]);
+                g.DrawLine(routeGlow, a, b);
+            }
+            // close loop
+            var first = Pt(_bestRoute[0]);
+            var last = Pt(_bestRoute[^1]);
+            g.DrawLine(routeGlow, last, first);
+
+            // crisp main stroke
+            for (int k = 0; k < _bestRoute.Length - 1; k++)
+            {
+                var a = Pt(_bestRoute[k]);
+                var b = Pt(_bestRoute[k + 1]);
+                g.DrawLine(routePen, a, b);
+            }
+            g.DrawLine(routePen, last, first);
+
+            // start marker
+            const int startR = 9;
+            using var startBrush = new SolidBrush(Color.Gold);
+            using var startPen = new Pen(Color.DarkGoldenrod, 2f);
+            g.FillEllipse(startBrush, first.X - startR, first.Y - startR, startR * 2, startR * 2);
+            g.DrawEllipse(startPen, first.X - startR, first.Y - startR, startR * 2, startR * 2);
+
+            // step numbers
+            using var stepFont = new Font(Font.FontFamily, Math.Max(8f, Font.Size - 1f), FontStyle.Bold);
+            using var stepBg = new SolidBrush(Color.FromArgb(210, Color.White));
+            using var stepFg = new SolidBrush(Color.RoyalBlue);
+
+            for (int step = 0; step < _bestRoute.Length; step++)
+            {
+                var p = Pt(_bestRoute[step]);
+                var label = (step + 1).ToString();
+                var size = g.MeasureString(label, stepFont);
+                var rectLbl = new RectangleF(p.X - size.Width / 2, p.Y - size.Height - 16, size.Width + 4, size.Height);
+                g.FillRectangle(stepBg, rectLbl);
+                g.DrawString(label, stepFont, stepFg, rectLbl.X + 2, rectLbl.Y);
+            }
+        }
+
+        // ===== tiny legend (bottom-right) =====
+        var legendText = "Legend:\nGreen = Safe\nRed = Unsafe\nGold = Start\nBlue Line = Route";
+        using (var legFont = new Font(Font.FontFamily, Math.Max(8f, Font.Size - 1f)))
+        {
+            var size = g.MeasureString(legendText, legFont);
+            var padBox = 6;
+            var box = new RectangleF(rect.Right - size.Width - padBox * 2 - 8,
+                                     rect.Bottom - size.Height - padBox * 2 - 8,
+                                     size.Width + padBox * 2, size.Height + padBox * 2);
+            using var boxBg = new SolidBrush(Color.FromArgb(210, Color.White));
+            using var boxPen = new Pen(Color.LightGray, 1f);
+            g.FillRectangle(boxBg, box);
+            g.DrawRectangle(boxPen, box.X, box.Y, box.Width, box.Height);
+            g.DrawString(legendText, legFont, Brushes.Black, box.X + padBox, box.Y + padBox);
+        }
     }
 
     //----------------------------part3-------------------------------------------
-
 
     private static double Distance(double x1, double y1, double x2, double y2)
     {
@@ -409,14 +477,44 @@ public partial class Form1 : Form
         return Math.Sqrt(dx * dx + dy * dy);
     }
 
-    private static double PathCost(int[] route, double[,] cost, bool returnToStart = true)
+    private double[,] BuildCostMatrix(IReadOnlyList<City> cities, double penalty)
     {
-        double sum = 0.0;
-        for (int k = 0; k < route.Length - 1; k++)
-            sum += cost[route[k], route[k + 1]];
-        if (returnToStart && route.Length > 1)
-            sum += cost[route[^1], route[0]];
-        return sum;
+        int n = cities.Count;
+        var m = new double[n, n];
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if (i == j)
+                {
+                    m[i, j] = 0;              
+                    continue;
+                }
+
+                double d = Distance(cities[i].X, cities[i].Y, cities[j].X, cities[j].Y);
+                double p = (cities[j].SafeToFly == 1) ? penalty : 0.0; 
+                m[i, j] = d + p;
+            }
+        }
+        return m;
+    }
+
+
+    private void btnOptimizeRoute_Click(object sender, EventArgs e)
+    {
+        const double PENALTY = 50.0;          
+
+        if (_cities.Count < 2)
+        {
+            MessageBox.Show("Add at least 2 cities first.", "Not enough cities",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+
+        _costMatrix = BuildCostMatrix(_cities, PENALTY);
+        lblStatus.Text = $"Cost matrix built for {_cities.Count} cities. Penalty = {PENALTY}.";
+        
     }
 
 

@@ -296,6 +296,7 @@
             btnOptimizeRoute.TabIndex = 23;
             btnOptimizeRoute.Text = "Optimize Route";
             btnOptimizeRoute.UseVisualStyleBackColor = true;
+            btnOptimizeRoute.Click += btnOptimizeRoute_Click;
             // 
             // Form1
             // 
