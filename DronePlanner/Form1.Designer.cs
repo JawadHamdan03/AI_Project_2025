@@ -52,6 +52,7 @@
             btnAddCity = new Button();
             pictureMap = new PictureBox();
             btnOptimizeRoute = new Button();
+            btnCostMatrix = new Button();
             ((System.ComponentModel.ISupportInitialize)numEpochs).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridViewResults).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numX).BeginInit();
@@ -290,7 +291,7 @@
             // 
             // btnOptimizeRoute
             // 
-            btnOptimizeRoute.Location = new Point(35, 694);
+            btnOptimizeRoute.Location = new Point(377, 696);
             btnOptimizeRoute.Name = "btnOptimizeRoute";
             btnOptimizeRoute.Size = new Size(157, 29);
             btnOptimizeRoute.TabIndex = 23;
@@ -298,12 +299,23 @@
             btnOptimizeRoute.UseVisualStyleBackColor = true;
             btnOptimizeRoute.Click += btnOptimizeRoute_Click;
             // 
+            // btnCostMatrix
+            // 
+            btnCostMatrix.Location = new Point(81, 696);
+            btnCostMatrix.Name = "btnCostMatrix";
+            btnCostMatrix.Size = new Size(187, 29);
+            btnCostMatrix.TabIndex = 24;
+            btnCostMatrix.Text = "Build Cost Matrix";
+            btnCostMatrix.UseVisualStyleBackColor = true;
+            btnCostMatrix.Click += btnCostMatrix_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ActiveCaption;
             ClientSize = new Size(1394, 786);
+            Controls.Add(btnCostMatrix);
             Controls.Add(btnOptimizeRoute);
             Controls.Add(pictureMap);
             Controls.Add(btnAddCity);
@@ -368,5 +380,6 @@
         private Button btnAddCity;
         private PictureBox pictureMap;
         private Button btnOptimizeRoute;
+        private Button btnCostMatrix;
     }
 }

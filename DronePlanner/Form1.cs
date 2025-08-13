@@ -452,21 +452,7 @@ public partial class Form1 : Form
             }
         }
 
-        // ===== tiny legend (bottom-right) =====
-        var legendText = "Legend:\nGreen = Safe\nRed = Unsafe\nGold = Start\nBlue Line = Route";
-        using (var legFont = new Font(Font.FontFamily, Math.Max(8f, Font.Size - 1f)))
-        {
-            var size = g.MeasureString(legendText, legFont);
-            var padBox = 6;
-            var box = new RectangleF(rect.Right - size.Width - padBox * 2 - 8,
-                                     rect.Bottom - size.Height - padBox * 2 - 8,
-                                     size.Width + padBox * 2, size.Height + padBox * 2);
-            using var boxBg = new SolidBrush(Color.FromArgb(210, Color.White));
-            using var boxPen = new Pen(Color.LightGray, 1f);
-            g.FillRectangle(boxBg, box);
-            g.DrawRectangle(boxPen, box.X, box.Y, box.Width, box.Height);
-            g.DrawString(legendText, legFont, Brushes.Black, box.X + padBox, box.Y + padBox);
-        }
+        
     }
 
     //----------------------------part3-------------------------------------------
@@ -488,22 +474,43 @@ public partial class Form1 : Form
             {
                 if (i == j)
                 {
-                    m[i, j] = 0;              
+                    m[i, j] = 0;
                     continue;
                 }
 
                 double d = Distance(cities[i].X, cities[i].Y, cities[j].X, cities[j].Y);
-                double p = (cities[j].SafeToFly == 1) ? penalty : 0.0; 
+                double p = (cities[j].SafeToFly == 1) ? penalty : 0.0;
                 m[i, j] = d + p;
             }
         }
         return m;
     }
 
-
-    private void btnOptimizeRoute_Click(object sender, EventArgs e)
+    private void ShowCostMatrixPreview(double[,] m)
     {
-        const double PENALTY = 50.0;          
+        int n = m.GetLength(0);
+        var t = new DataTable();
+
+        t.Columns.Add("From\\To", typeof(string));
+        for (int j = 0; j < n; j++)
+            t.Columns.Add($"C{j + 1}", typeof(double));
+
+        for (int i = 0; i < n; i++)
+        {
+            var row = t.NewRow();
+            row[0] = $"C{i + 1}";
+            for (int j = 0; j < n; j++)
+                row[j + 1] = Math.Round(m[i, j], 2);
+            t.Rows.Add(row);
+        }
+
+        dataGridViewResults.DataSource = t;
+        dataGridViewResults.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+    }
+
+    private void btnCostMatrix_Click(object sender, EventArgs e)
+    {
+        const double PENALTY = 50.0;
 
         if (_cities.Count < 2)
         {
@@ -514,9 +521,16 @@ public partial class Form1 : Form
 
         _costMatrix = BuildCostMatrix(_cities, PENALTY);
         lblStatus.Text = $"Cost matrix built for {_cities.Count} cities. Penalty = {PENALTY}.";
-        
+        ShowCostMatrixPreview(_costMatrix);
     }
 
 
 
+    //-----------------part 4---------------------------
+    private void btnOptimizeRoute_Click(object sender, EventArgs e)
+    {
+        
+    }
+
+   
 }
