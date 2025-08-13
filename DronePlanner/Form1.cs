@@ -6,9 +6,9 @@ namespace DronePlanner;
 public partial class Form1 : Form
 {
 
-    private double[][]? _inputs;
-    private int[]? _labels;
-    private Perceptron? _model;
+    private double[][]? Inputs;
+    private int[]? Labels;
+    private Perceptron? Classifier;
     private double[][] _xTrain;
     private int[] _yTrain;
     private double[][] _xTest;
@@ -19,6 +19,12 @@ public partial class Form1 : Form
     private List<City> _cities = new List<City>();
     private double[,]? _costMatrix;
     private const int MapPadding = 30;
+
+
+    private int[]? _bestRoute;
+    private double _bestCost;
+    private const double DEFAULT_UNSAFE_PENALTY = 50.0;
+    private readonly Pen _routePen = new(Color.RoyalBlue, 2f);
 
 
     public Form1()
@@ -38,12 +44,12 @@ public partial class Form1 : Form
 
         try
         {
-            DataLoader.LoadData(ofd.FileName, out _inputs!, out _labels!);
-            lblStatus.Text = $"Loaded {_inputs.Length} rows from {Path.GetFileName(ofd.FileName)}";
-            btnTrain.Enabled = _inputs.Length > 0;   // enable Train now that we have data
-            btnPredict.Enabled = false;              // require training first
+            DataLoader.LoadData(ofd.FileName, out Inputs!, out Labels!);
+            lblStatus.Text = $"Loaded {Inputs.Length} rows from {Path.GetFileName(ofd.FileName)}";
+            btnTrain.Enabled = Inputs.Length > 0;   
+            btnPredict.Enabled = false;              
             lblAccuracy.Text = "Accuracy: —";
-            dataGridViewResults.DataSource = null;   // clear any old table
+            dataGridViewResults.DataSource = null;   
         }
         catch (Exception ex)
         {
@@ -53,9 +59,9 @@ public partial class Form1 : Form
         }
     }
 
-    private async void btnTrain_Click(object sender, EventArgs e)
+    private  void btnTrain_Click(object sender, EventArgs e)
     {
-        if (_inputs == null || _labels == null || _inputs.Length == 0)
+        if (Inputs == null || Labels == null || Inputs.Length == 0)
         {
             lblStatus.Text = "Load data first.";
             return;
@@ -76,7 +82,7 @@ public partial class Form1 : Form
         }
 
         // 80/20 split with reproducible shuffle
-        int n = _inputs.Length;
+        int n = Inputs.Length;
         var idx = Enumerable.Range(0, n).ToArray();
         var rng = new Random(42);
         for (int i = idx.Length - 1; i > 0; i--)
@@ -88,15 +94,18 @@ public partial class Form1 : Form
         int nTrain = (int)Math.Round(n * 0.8);
         int nTest = n - nTrain;
 
-        (_xTrain, _yTrain) = BuildSubset(_inputs, _labels, idx, 0, nTrain);
-        (_xTest, _yTest) = BuildSubset(_inputs, _labels, idx, nTrain, nTest);
+        (_xTrain, _yTrain) = BuildSubset(Inputs, Labels, idx, 0, nTrain);
+        (_xTest, _yTest) = BuildSubset(Inputs, Labels, idx, nTrain, nTest);
         _testIdx = idx.Skip(nTrain).Take(nTest).ToArray();
 
         // Random-init perceptron (constructor does random init if no weights passed)
-        _model = new Perceptron(_xTrain[0].Length, lr);
+        Classifier = new Perceptron(_xTrain[0].Length, lr);
 
         // Train on 80%
-        _model.Train(_xTrain, _yTrain, epochs);
+        Classifier.Train(_xTrain, _yTrain, epochs);
+
+        Console.WriteLine($"after training : \n w1={Classifier.Weights[0]},  w2={Classifier.Weights[1]}, w3={Classifier.Weights[2]}");
+
 
         lblStatus.Text = $"Trained on {nTrain} samples. Ready to predict on {nTest}.";
         btnPredict.Enabled = true;
@@ -104,7 +113,7 @@ public partial class Form1 : Form
 
     private void btnPredict_Click(object sender, EventArgs e)
     {
-        if (_model == null || _xTest == null || _yTest == null || _testIdx == null)
+        if (Classifier == null || _xTest == null || _yTest == null || _testIdx == null)
         {
             lblStatus.Text = "Train the model first.";
             return;
@@ -123,7 +132,7 @@ public partial class Form1 : Form
 
         for (int i = 0; i < _xTest.Length; i++)
         {
-            int pred = _model.Predict(_xTest[i]);
+            int pred = Classifier.Predict(_xTest[i]);
             int actual = _yTest[i];
 
             if (pred == 1 && actual == 1) tp++;
@@ -175,9 +184,9 @@ public partial class Form1 : Form
 
     private void btnClear_Click(object sender, EventArgs e)
     {
-        _inputs = null;
-        _labels = null;
-        _model = null;
+        Inputs = null;
+        Labels = null;
+        Classifier = null;
 
         dataGridViewResults.DataSource = null;
         lblStatus.Text = "Cleared.";
@@ -212,7 +221,7 @@ public partial class Form1 : Form
     //----------------------------part2-----------------------------------------
     private void btnAddCity_Click(object sender, EventArgs e)
     {
-        if (_model == null)
+        if (Classifier == null)
         {
             MessageBox.Show("Train the perceptron first.", "Model Not Ready",
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -227,7 +236,7 @@ public partial class Form1 : Form
         double wind = (double)numWind.Value;
 
         
-        int prediction = _model.Predict(new double[] { temp, humidity, wind });
+        int prediction = Classifier.Predict(new double[] { temp, humidity, wind });
 
         
         var city = new City
@@ -392,4 +401,24 @@ public partial class Form1 : Form
     }
 
     //----------------------------part3-------------------------------------------
+
+
+    private static double Distance(double x1, double y1, double x2, double y2)
+    {
+        double dx = x1 - x2, dy = y1 - y2;
+        return Math.Sqrt(dx * dx + dy * dy);
+    }
+
+    private static double PathCost(int[] route, double[,] cost, bool returnToStart = true)
+    {
+        double sum = 0.0;
+        for (int k = 0; k < route.Length - 1; k++)
+            sum += cost[route[k], route[k + 1]];
+        if (returnToStart && route.Length > 1)
+            sum += cost[route[^1], route[0]];
+        return sum;
+    }
+
+
+
 }

@@ -51,6 +51,7 @@
             label7 = new Label();
             btnAddCity = new Button();
             pictureMap = new PictureBox();
+            btnOptimizeRoute = new Button();
             ((System.ComponentModel.ISupportInitialize)numEpochs).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridViewResults).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numX).BeginInit();
@@ -287,12 +288,22 @@
             pictureMap.TabStop = false;
             pictureMap.Paint += pictureMap_Paint;
             // 
+            // btnOptimizeRoute
+            // 
+            btnOptimizeRoute.Location = new Point(35, 694);
+            btnOptimizeRoute.Name = "btnOptimizeRoute";
+            btnOptimizeRoute.Size = new Size(157, 29);
+            btnOptimizeRoute.TabIndex = 23;
+            btnOptimizeRoute.Text = "Optimize Route";
+            btnOptimizeRoute.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ActiveCaption;
-            ClientSize = new Size(1394, 670);
+            ClientSize = new Size(1394, 786);
+            Controls.Add(btnOptimizeRoute);
             Controls.Add(pictureMap);
             Controls.Add(btnAddCity);
             Controls.Add(numWind);
@@ -355,5 +366,6 @@
         private Label label7;
         private Button btnAddCity;
         private PictureBox pictureMap;
+        private Button btnOptimizeRoute;
     }
 }
