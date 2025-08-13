@@ -94,8 +94,8 @@ public partial class Form1 : Form
         int nTrain = (int)Math.Round(n * 0.8);
         int nTest = n - nTrain;
 
-        (_xTrain, _yTrain) = BuildSubset(Inputs, Labels, idx, 0, nTrain);
-        (_xTest, _yTest) = BuildSubset(Inputs, Labels, idx, nTrain, nTest);
+        (_xTrain, _yTrain) = Services.BuildSubset(Inputs, Labels, idx, 0, nTrain);
+        (_xTest, _yTest) = Services.BuildSubset(Inputs, Labels, idx, nTrain, nTest);
         _testIdx = idx.Skip(nTrain).Take(nTest).ToArray();
 
         // Random-init perceptron (constructor does random init if no weights passed)
@@ -201,23 +201,6 @@ public partial class Form1 : Form
         btnPredict.Enabled = false;
     }
 
-
-    private static (double[][] X, int[] y) BuildSubset(double[][] X, int[] y, int[] idx, int start, int count)
-    {
-        var subX = new double[count][];
-        var subY = new int[count];
-        for (int k = 0; k < count; k++)
-        {
-            int src = idx[start + k];
-            var row = X[src];
-            var copy = new double[row.Length];
-            Array.Copy(row, copy, row.Length);
-            subX[k] = copy;
-            subY[k] = y[src];
-        }
-        return (subX, subY);
-    }
-
     //----------------------------part2-----------------------------------------
     private void btnAddCity_Click(object sender, EventArgs e)
     {
@@ -291,6 +274,29 @@ public partial class Form1 : Form
         }
     }
 
+    //----------------------------part3-------------------------------------------
+    private void btnCostMatrix_Click(object sender, EventArgs e)
+    {
+        const double PENALTY = 50.0;
+
+        if (_cities.Count < 2)
+        {
+            MessageBox.Show("Add at least 2 cities first.", "Not enough cities",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+
+        _costMatrix = Services.BuildCostMatrix(_cities, PENALTY);
+        lblStatus.Text = $"Cost matrix built for {_cities.Count} cities. Penalty = {PENALTY}.";
+        Services.ShowCostMatrixPreview(_costMatrix,dataGridViewResults);
+    }
+
+    //-----------------part 4---------------------------
+    private void btnOptimizeRoute_Click(object sender, EventArgs e)
+    {
+        
+    }
+    //----------------maping paint------------
     private void pictureMap_Paint(object sender, PaintEventArgs e)
     {
         var g = e.Graphics;
@@ -300,7 +306,7 @@ public partial class Form1 : Form
         using (var borderPen = new Pen(Color.LightGray, 1))
             g.DrawRectangle(borderPen, rect.Left + 1, rect.Top + 1, rect.Width - 2, rect.Height - 2);
 
-        // Empty state
+
         if (_cities == null || _cities.Count == 0)
         {
             using var hintBrush = new SolidBrush(Color.Gray);
@@ -452,85 +458,7 @@ public partial class Form1 : Form
             }
         }
 
-        
+
     }
 
-    //----------------------------part3-------------------------------------------
-
-    private static double Distance(double x1, double y1, double x2, double y2)
-    {
-        double dx = x1 - x2, dy = y1 - y2;
-        return Math.Sqrt(dx * dx + dy * dy);
-    }
-
-    private double[,] BuildCostMatrix(IReadOnlyList<City> cities, double penalty)
-    {
-        int n = cities.Count;
-        var m = new double[n, n];
-
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = 0; j < n; j++)
-            {
-                if (i == j)
-                {
-                    m[i, j] = 0;
-                    continue;
-                }
-
-                double d = Distance(cities[i].X, cities[i].Y, cities[j].X, cities[j].Y);
-                double p = (cities[j].SafeToFly == 1) ? penalty : 0.0;
-                m[i, j] = d + p;
-            }
-        }
-        return m;
-    }
-
-    private void ShowCostMatrixPreview(double[,] m)
-    {
-        int n = m.GetLength(0);
-        var t = new DataTable();
-
-        t.Columns.Add("From\\To", typeof(string));
-        for (int j = 0; j < n; j++)
-            t.Columns.Add($"C{j + 1}", typeof(double));
-
-        for (int i = 0; i < n; i++)
-        {
-            var row = t.NewRow();
-            row[0] = $"C{i + 1}";
-            for (int j = 0; j < n; j++)
-                row[j + 1] = Math.Round(m[i, j], 2);
-            t.Rows.Add(row);
-        }
-
-        dataGridViewResults.DataSource = t;
-        dataGridViewResults.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-    }
-
-    private void btnCostMatrix_Click(object sender, EventArgs e)
-    {
-        const double PENALTY = 50.0;
-
-        if (_cities.Count < 2)
-        {
-            MessageBox.Show("Add at least 2 cities first.", "Not enough cities",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
-            return;
-        }
-
-        _costMatrix = BuildCostMatrix(_cities, PENALTY);
-        lblStatus.Text = $"Cost matrix built for {_cities.Count} cities. Penalty = {PENALTY}.";
-        ShowCostMatrixPreview(_costMatrix);
-    }
-
-
-
-    //-----------------part 4---------------------------
-    private void btnOptimizeRoute_Click(object sender, EventArgs e)
-    {
-        
-    }
-
-   
 }

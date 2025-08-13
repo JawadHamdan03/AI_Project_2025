@@ -291,22 +291,26 @@
             // 
             // btnOptimizeRoute
             // 
+            btnOptimizeRoute.BackColor = Color.Chartreuse;
+            btnOptimizeRoute.FlatStyle = FlatStyle.Popup;
             btnOptimizeRoute.Location = new Point(377, 696);
             btnOptimizeRoute.Name = "btnOptimizeRoute";
             btnOptimizeRoute.Size = new Size(157, 29);
             btnOptimizeRoute.TabIndex = 23;
             btnOptimizeRoute.Text = "Optimize Route";
-            btnOptimizeRoute.UseVisualStyleBackColor = true;
+            btnOptimizeRoute.UseVisualStyleBackColor = false;
             btnOptimizeRoute.Click += btnOptimizeRoute_Click;
             // 
             // btnCostMatrix
             // 
+            btnCostMatrix.BackColor = Color.Chartreuse;
+            btnCostMatrix.FlatStyle = FlatStyle.Popup;
             btnCostMatrix.Location = new Point(81, 696);
             btnCostMatrix.Name = "btnCostMatrix";
             btnCostMatrix.Size = new Size(187, 29);
             btnCostMatrix.TabIndex = 24;
             btnCostMatrix.Text = "Build Cost Matrix";
-            btnCostMatrix.UseVisualStyleBackColor = true;
+            btnCostMatrix.UseVisualStyleBackColor = false;
             btnCostMatrix.Click += btnCostMatrix_Click;
             // 
             // Form1
