@@ -1,4 +1,5 @@
-﻿using DronePlanner.Models;
+﻿using DocumentFormat.OpenXml.EMMA;
+using DronePlanner.Models;
 using System.Data;
 
 namespace DronePlanner;
@@ -26,6 +27,10 @@ public partial class Form1 : Form
     private const double DEFAULT_UNSAFE_PENALTY = 50.0;
     private readonly Pen _routePen = new(Color.RoyalBlue, 2f);
 
+    private readonly Random _rng = new Random();
+
+    private int[]? _route;     // current route (random first)
+    private double _routeCost; // cost of current route
 
     public Form1()
     {
@@ -277,8 +282,6 @@ public partial class Form1 : Form
     //----------------------------part3-------------------------------------------
     private void btnCostMatrix_Click(object sender, EventArgs e)
     {
-        const double PENALTY = 50.0;
-
         if (_cities.Count < 2)
         {
             MessageBox.Show("Add at least 2 cities first.", "Not enough cities",
@@ -286,16 +289,110 @@ public partial class Form1 : Form
             return;
         }
 
+        const double PENALTY = 50.0;      
+        bool returnToStart = true;        
+
         _costMatrix = Services.BuildCostMatrix(_cities, PENALTY);
-        lblStatus.Text = $"Cost matrix built for {_cities.Count} cities. Penalty = {PENALTY}.";
-        Services.ShowCostMatrixPreview(_costMatrix,dataGridViewResults);
+
+        int n = _cities.Count;
+        _route = Enumerable.Range(0, n).ToArray();
+        Services.Shuffle(_route);                   
+
+        _routeCost = Services.RouteCost(_route, _costMatrix, returnToStart);
+        lblAccuracy.Text = $"Random route cost: {_routeCost:F2}";
+        lblStatus.Text = "Random route generated.";
+        pictureMap.Invalidate();           
     }
 
     //-----------------part 4---------------------------
     private void btnOptimizeRoute_Click(object sender, EventArgs e)
     {
-        
+        if (_costMatrix == null || _route == null || _route.Length < 2)
+        {
+            MessageBox.Show("Build the cost matrix first to create a random route.",
+                            "No route yet", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+
+        double before = Services.RouteCost(_route, _costMatrix, returnToStart: true);
+
+        var (bestRoute, bestCost) = SimulatedAnnealing(
+            _costMatrix,
+            _route,                
+            iterMax: 12_000,       
+            t0: 800.0,             
+            alpha: 0.995,          
+            returnToStart: true,
+            seed: null             
+        );
+
+        _route = bestRoute;        
+        _routeCost = bestCost;
+
+        double improvement = (before > 0) ? (before - bestCost) / before * 100.0 : 0.0;
+        lblAccuracy.Text = $"Before: {before:F2}  →  After: {bestCost:F2}  ({improvement:F1}% better)";
+        lblStatus.Text = "Simulated annealing complete.";
+        pictureMap.Invalidate();
     }
+
+    private static double CalcTemp(int i, double t0, double alpha) => t0 * Math.Pow(alpha, i);
+
+    private (int[] route, double cost) SimulatedAnnealing(
+        double[,] costMatrix,
+        int[] initialRoute,     
+        int iterMax = 10_000,   
+        double t0 = 1000.0,     
+        double alpha = 0.995,   
+        bool returnToStart = true,
+        int? seed = null)
+    {
+        var rng = seed.HasValue ? new Random(seed.Value) : new Random();
+
+        var x_curr = (int[])initialRoute.Clone();
+        double f_curr = Services.RouteCost(x_curr, costMatrix, returnToStart);
+
+        var x_best = (int[])x_curr.Clone();
+        double f_best = f_curr;
+
+        for (int i = 1; i <= iterMax; i++)
+        {
+            double Tc = CalcTemp(i, t0, alpha);
+            if (Tc <= 1e-12) break; 
+
+            var x_next = (int[])x_curr.Clone();
+            int a = rng.Next(x_next.Length);
+            int b = rng.Next(x_next.Length);
+            if (a != b) (x_next[a], x_next[b]) = (x_next[b], x_next[a]);
+
+            double f_next = Services.RouteCost(x_next, costMatrix, returnToStart);
+            double delta = f_curr - f_next;  
+
+            if (delta > 0)
+            {
+                x_curr = x_next;
+                f_curr = f_next;
+
+                if (f_next < f_best)
+                {
+                    x_best = (int[])x_next.Clone();
+                    f_best = f_next;
+                }
+            }
+            else
+            {
+                double acceptProb = Math.Exp(delta / Tc); 
+                if (rng.NextDouble() < acceptProb)
+                {
+                    x_curr = x_next;
+                    f_curr = f_next;
+                }
+            }
+        }
+
+        return (x_best, f_best);
+    }
+
+
     //----------------maping paint------------
     private void pictureMap_Paint(object sender, PaintEventArgs e)
     {
@@ -306,7 +403,7 @@ public partial class Form1 : Form
         using (var borderPen = new Pen(Color.LightGray, 1))
             g.DrawRectangle(borderPen, rect.Left + 1, rect.Top + 1, rect.Width - 2, rect.Height - 2);
 
-
+        // empty state
         if (_cities == null || _cities.Count == 0)
         {
             using var hintBrush = new SolidBrush(Color.Gray);
@@ -315,7 +412,7 @@ public partial class Form1 : Form
             return;
         }
 
-        // World bounds from cities (+margin)
+        // ----- bounds (+margin) -----
         double minX = _cities.Min(c => c.X);
         double maxX = _cities.Max(c => c.X);
         double minY = _cities.Min(c => c.Y);
@@ -325,7 +422,7 @@ public partial class Form1 : Form
         double dy = Math.Max(1, (maxY - minY) * 0.05);
         minX -= dx; maxX += dx; minY -= dy; maxY += dy;
 
-        // Ensure (0,0) axes can appear
+        // include (0,0) so axes can show
         if (minX > 0) minX = 0;
         if (maxX < 0) maxX = 0;
         if (minY > 0) minY = 0;
@@ -340,14 +437,16 @@ public partial class Form1 : Form
 
         PointF Map(double x, double y)
         {
-            double sx = (x - minX) / (maxX - minX);
-            double sy = (y - minY) / (maxY - minY);
+            double rx = (maxX - minX);
+            double ry = (maxY - minY);
+            double sx = rx == 0 ? 0.5 : (x - minX) / rx;
+            double sy = ry == 0 ? 0.5 : (y - minY) / ry;
             float px = left + (float)(sx * width);
             float py = bottom - (float)(sy * height); // invert Y
             return new PointF(px, py);
         }
 
-        // Axes through (0,0) if visible
+        // ----- axes -----
         using (var axisPen = new Pen(Color.Black, 1))
         {
             if (minY <= 0 && maxY >= 0)
@@ -362,15 +461,15 @@ public partial class Form1 : Form
             }
         }
 
-        // Ticks & labels
+        // ----- ticks & labels -----
         using (var labelBrush = new SolidBrush(Color.Black))
         {
             int xTicks = 5;
-            double tickYValue = (minY <= 0 && maxY >= 0) ? 0 : minY; // place ticks on axis if visible, else on bottom
+            double tickY = (minY <= 0 && maxY >= 0) ? 0 : minY;
             for (int i = 0; i <= xTicks; i++)
             {
                 double val = minX + i * (maxX - minX) / xTicks;
-                var p = Map(val, tickYValue);
+                var p = Map(val, tickY);
                 g.DrawLine(Pens.Black, p.X, p.Y - 3, p.X, p.Y + 3);
                 var text = val.ToString("0.0");
                 var size = g.MeasureString(text, Font);
@@ -378,11 +477,11 @@ public partial class Form1 : Form
             }
 
             int yTicks = 5;
-            double tickXValue = (minX <= 0 && maxX >= 0) ? 0 : minX; // place ticks on axis if visible, else on left
+            double tickX = (minX <= 0 && maxX >= 0) ? 0 : minX;
             for (int i = 0; i <= yTicks; i++)
             {
                 double val = minY + i * (maxY - minY) / yTicks;
-                var p = Map(tickXValue, val);
+                var p = Map(tickX, val);
                 g.DrawLine(Pens.Black, p.X - 3, p.Y, p.X + 3, p.Y);
                 var text = val.ToString("0.0");
                 var size = g.MeasureString(text, Font);
@@ -390,75 +489,114 @@ public partial class Form1 : Form
             }
         }
 
-        // Cities
+        // ----- draw city dots FIRST (no text yet) -----
         using var safeBrush = new SolidBrush(Color.FromArgb(60, 180, 75));
         using var unsafeBrush = new SolidBrush(Color.FromArgb(240, 80, 80));
-        using var textBrush = new SolidBrush(Color.Black);
         const int R = 6;
 
         foreach (var c in _cities)
         {
             var p = Map(c.X, c.Y);
             var brush = (c.SafeToFly == 0) ? safeBrush : unsafeBrush;
-
             g.FillEllipse(brush, p.X - R, p.Y - R, R * 2, R * 2);
             g.DrawEllipse(Pens.Black, p.X - R, p.Y - R, R * 2, R * 2);
-            g.DrawString($"C{c.Id}", this.Font, textBrush, p.X + R + 3, p.Y - (R + 3));
         }
 
-        // ===== draw best route (if available) =====
-        if (_bestRoute != null && _bestRoute.Length >= 2)
+        // ===== draw CURRENT route (_route) so numbers/labels can be on top =====
+        if (_route != null && _route.Length >= 2)
         {
             using var routePen = new Pen(Color.RoyalBlue, 2f);
-            using var routeGlow = new Pen(Color.FromArgb(80, 65, 105, 225), 6f); // soft outer stroke
-
             PointF Pt(int idx) => Map(_cities[idx].X, _cities[idx].Y);
 
-            // glow underlay
-            for (int k = 0; k < _bestRoute.Length - 1; k++)
+            for (int k = 0; k < _route.Length - 1; k++)
             {
-                var a = Pt(_bestRoute[k]);
-                var b = Pt(_bestRoute[k + 1]);
-                g.DrawLine(routeGlow, a, b);
-            }
-            // close loop
-            var first = Pt(_bestRoute[0]);
-            var last = Pt(_bestRoute[^1]);
-            g.DrawLine(routeGlow, last, first);
-
-            // crisp main stroke
-            for (int k = 0; k < _bestRoute.Length - 1; k++)
-            {
-                var a = Pt(_bestRoute[k]);
-                var b = Pt(_bestRoute[k + 1]);
+                var a = Pt(_route[k]);
+                var b = Pt(_route[k + 1]);
                 g.DrawLine(routePen, a, b);
             }
+            // close the loop
+            var first = Pt(_route[0]);
+            var last = Pt(_route[^1]);
             g.DrawLine(routePen, last, first);
 
-            // start marker
-            const int startR = 9;
-            using var startBrush = new SolidBrush(Color.Gold);
-            using var startPen = new Pen(Color.DarkGoldenrod, 2f);
-            g.FillEllipse(startBrush, first.X - startR, first.Y - startR, startR * 2, startR * 2);
-            g.DrawEllipse(startPen, first.X - startR, first.Y - startR, startR * 2, startR * 2);
-
-            // step numbers
+            // ----- step numbers ON TOP of route -----
             using var stepFont = new Font(Font.FontFamily, Math.Max(8f, Font.Size - 1f), FontStyle.Bold);
-            using var stepBg = new SolidBrush(Color.FromArgb(210, Color.White));
+            using var stepBg = new SolidBrush(Color.FromArgb(230, Color.White));
             using var stepFg = new SolidBrush(Color.RoyalBlue);
 
-            for (int step = 0; step < _bestRoute.Length; step++)
+            for (int step = 0; step < _route.Length; step++)
             {
-                var p = Pt(_bestRoute[step]);
+                var p = Pt(_route[step]);
                 var label = (step + 1).ToString();
                 var size = g.MeasureString(label, stepFont);
-                var rectLbl = new RectangleF(p.X - size.Width / 2, p.Y - size.Height - 16, size.Width + 4, size.Height);
+
+                // small offset above node center
+                var rectLbl = new RectangleF(p.X - size.Width / 2, p.Y - size.Height - 14, size.Width + 4, size.Height);
                 g.FillRectangle(stepBg, rectLbl);
                 g.DrawString(label, stepFont, stepFg, rectLbl.X + 2, rectLbl.Y);
             }
         }
 
+        // ----- city labels LAST so they’re always readable -----
+        using var textBrush = new SolidBrush(Color.Black);
+        foreach (var c in _cities)
+        {
+            var p = Map(c.X, c.Y);
+            g.DrawString($"C{c.Id}", this.Font, textBrush, p.X + R + 3, p.Y - (R + 3));
+        }
+    }
 
+    private void btnAddRandomCity_Click(object sender, EventArgs e)
+    {
+        AddRandomCity();
+    }
+    private void AddRandomCity()
+    {
+        double minX = -50, maxX = 50;
+        double minY = -50, maxY = 50;
+        double minTemp = 0, maxTemp = 40;
+        double minHum = 10, maxHum = 90;
+        double minWind = 0, maxWind = 40;
+
+        double Rand(double a, double b) => a + _rng.NextDouble() * (b - a);
+
+        var city = new City
+        {
+            Id = _cities.Count + 1,
+            X = Rand(minX, maxX),
+            Y = Rand(minY, maxY),
+            Temp = Rand(minTemp, maxTemp),
+            Humidity = Rand(minHum, maxHum),
+            Wind = Rand(minWind, maxWind),
+            SafeToFly = 0 
+        };
+
+        if (Classifier != null)
+            city.SafeToFly = Classifier.Predict(new[] { city.Temp, city.Humidity, city.Wind });
+
+        _cities.Add(city);
+
+        var table = new DataTable();
+        table.Columns.Add("ID", typeof(int));
+        table.Columns.Add("X", typeof(double));
+        table.Columns.Add("Y", typeof(double));
+        table.Columns.Add("Temp", typeof(double));
+        table.Columns.Add("Humidity", typeof(double));
+        table.Columns.Add("Wind", typeof(double));
+        table.Columns.Add("SafeToFly", typeof(int));
+
+        foreach (var c in _cities)
+            table.Rows.Add(c.Id, c.X, c.Y, c.Temp, c.Humidity, c.Wind, c.SafeToFly);
+
+        dataGridViewResults.DataSource = table;
+        dataGridViewResults.CellFormatting -= CityCellFormatting;
+        dataGridViewResults.CellFormatting += CityCellFormatting;
+
+        lblStatus.Text = (Classifier != null)
+            ? "Random city added (classified by Perceptron)."
+            : "Random city added (train the Perceptron to classify).";
+
+        pictureMap.Invalidate();
     }
 
 }

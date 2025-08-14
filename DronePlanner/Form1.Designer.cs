@@ -53,6 +53,7 @@
             pictureMap = new PictureBox();
             btnOptimizeRoute = new Button();
             btnCostMatrix = new Button();
+            btnAddRandomCity = new Button();
             ((System.ComponentModel.ISupportInitialize)numEpochs).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridViewResults).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numX).BeginInit();
@@ -272,7 +273,7 @@
             // 
             btnAddCity.BackColor = Color.OliveDrab;
             btnAddCity.FlatStyle = FlatStyle.Popup;
-            btnAddCity.Location = new Point(1216, 129);
+            btnAddCity.Location = new Point(1216, 125);
             btnAddCity.Name = "btnAddCity";
             btnAddCity.Size = new Size(150, 29);
             btnAddCity.TabIndex = 21;
@@ -293,7 +294,7 @@
             // 
             btnOptimizeRoute.BackColor = Color.Chartreuse;
             btnOptimizeRoute.FlatStyle = FlatStyle.Popup;
-            btnOptimizeRoute.Location = new Point(377, 696);
+            btnOptimizeRoute.Location = new Point(728, 680);
             btnOptimizeRoute.Name = "btnOptimizeRoute";
             btnOptimizeRoute.Size = new Size(157, 29);
             btnOptimizeRoute.TabIndex = 23;
@@ -305,7 +306,7 @@
             // 
             btnCostMatrix.BackColor = Color.Chartreuse;
             btnCostMatrix.FlatStyle = FlatStyle.Popup;
-            btnCostMatrix.Location = new Point(81, 696);
+            btnCostMatrix.Location = new Point(12, 695);
             btnCostMatrix.Name = "btnCostMatrix";
             btnCostMatrix.Size = new Size(187, 29);
             btnCostMatrix.TabIndex = 24;
@@ -313,12 +314,25 @@
             btnCostMatrix.UseVisualStyleBackColor = false;
             btnCostMatrix.Click += btnCostMatrix_Click;
             // 
+            // btnAddRandomCity
+            // 
+            btnAddRandomCity.BackColor = Color.OliveDrab;
+            btnAddRandomCity.FlatStyle = FlatStyle.Popup;
+            btnAddRandomCity.Location = new Point(1216, 178);
+            btnAddRandomCity.Name = "btnAddRandomCity";
+            btnAddRandomCity.Size = new Size(150, 29);
+            btnAddRandomCity.TabIndex = 25;
+            btnAddRandomCity.Text = "Add Random City";
+            btnAddRandomCity.UseVisualStyleBackColor = false;
+            btnAddRandomCity.Click += btnAddRandomCity_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ActiveCaption;
             ClientSize = new Size(1394, 786);
+            Controls.Add(btnAddRandomCity);
             Controls.Add(btnCostMatrix);
             Controls.Add(btnOptimizeRoute);
             Controls.Add(pictureMap);
@@ -385,5 +399,6 @@
         private PictureBox pictureMap;
         private Button btnOptimizeRoute;
         private Button btnCostMatrix;
+        private Button btnAddRandomCity;
     }
 }

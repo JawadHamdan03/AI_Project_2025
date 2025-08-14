@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.EMMA;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -24,7 +25,6 @@ public class Services
         }
         return (subX, subY);
     }
-
 
 
     internal static void ShowCostMatrixPreview(double[,] m, DataGridView dataGridViewResults)
@@ -57,7 +57,6 @@ public class Services
     }
 
 
-
     internal static double[,] BuildCostMatrix(List<City> cities, double penalty)
     {
         int n = cities.Count;
@@ -80,5 +79,27 @@ public class Services
         }
         return m;
     }
+
+
+    internal static void Shuffle(int[] a, int? seed = null)
+    {
+        var rng = seed.HasValue ? new Random(seed.Value) : new Random();
+        for (int i = a.Length - 1; i > 0; i--)
+        {
+            int j = rng.Next(i + 1);
+            (a[i], a[j]) = (a[j], a[i]);
+        }
+    }
+
+    internal static double RouteCost(int[] route, double[,] cost, bool returnToStart = true)
+    {
+        double sum = 0.0;
+        for (int k = 0; k < route.Length - 1; k++)
+            sum += cost[route[k], route[k + 1]];
+        if (returnToStart && route.Length > 1)
+            sum += cost[route[^1], route[0]];
+        return sum;
+    }
+
 
 }
