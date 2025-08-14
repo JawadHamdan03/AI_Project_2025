@@ -294,7 +294,7 @@
             // 
             btnOptimizeRoute.BackColor = Color.Chartreuse;
             btnOptimizeRoute.FlatStyle = FlatStyle.Popup;
-            btnOptimizeRoute.Location = new Point(728, 680);
+            btnOptimizeRoute.Location = new Point(728, 695);
             btnOptimizeRoute.Name = "btnOptimizeRoute";
             btnOptimizeRoute.Size = new Size(157, 29);
             btnOptimizeRoute.TabIndex = 23;

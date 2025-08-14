@@ -289,19 +289,20 @@ public partial class Form1 : Form
             return;
         }
 
-        const double PENALTY = 50.0;      
-        bool returnToStart = true;        
+        const double PENALTY = 50.0; 
+        bool returnToStart = true;   
 
         _costMatrix = Services.BuildCostMatrix(_cities, PENALTY);
 
         int n = _cities.Count;
         _route = Enumerable.Range(0, n).ToArray();
-        Services.Shuffle(_route);                   
+        Services.Shuffle(_route, _rng); 
 
         _routeCost = Services.RouteCost(_route, _costMatrix, returnToStart);
         lblAccuracy.Text = $"Random route cost: {_routeCost:F2}";
-        lblStatus.Text = "Random route generated.";
-        pictureMap.Invalidate();           
+        lblStatus.Text = "Random route generated (distance + penalty).";
+
+        pictureMap.Invalidate(); 
     }
 
     //-----------------part 4---------------------------
@@ -403,7 +404,6 @@ public partial class Form1 : Form
         using (var borderPen = new Pen(Color.LightGray, 1))
             g.DrawRectangle(borderPen, rect.Left + 1, rect.Top + 1, rect.Width - 2, rect.Height - 2);
 
-        // empty state
         if (_cities == null || _cities.Count == 0)
         {
             using var hintBrush = new SolidBrush(Color.Gray);
@@ -412,7 +412,6 @@ public partial class Form1 : Form
             return;
         }
 
-        // ----- bounds (+margin) -----
         double minX = _cities.Min(c => c.X);
         double maxX = _cities.Max(c => c.X);
         double minY = _cities.Min(c => c.Y);
@@ -422,7 +421,6 @@ public partial class Form1 : Form
         double dy = Math.Max(1, (maxY - minY) * 0.05);
         minX -= dx; maxX += dx; minY -= dy; maxY += dy;
 
-        // include (0,0) so axes can show
         if (minX > 0) minX = 0;
         if (maxX < 0) maxX = 0;
         if (minY > 0) minY = 0;
@@ -442,11 +440,10 @@ public partial class Form1 : Form
             double sx = rx == 0 ? 0.5 : (x - minX) / rx;
             double sy = ry == 0 ? 0.5 : (y - minY) / ry;
             float px = left + (float)(sx * width);
-            float py = bottom - (float)(sy * height); // invert Y
+            float py = bottom - (float)(sy * height); 
             return new PointF(px, py);
         }
 
-        // ----- axes -----
         using (var axisPen = new Pen(Color.Black, 1))
         {
             if (minY <= 0 && maxY >= 0)
@@ -461,7 +458,6 @@ public partial class Form1 : Form
             }
         }
 
-        // ----- ticks & labels -----
         using (var labelBrush = new SolidBrush(Color.Black))
         {
             int xTicks = 5;
@@ -489,7 +485,6 @@ public partial class Form1 : Form
             }
         }
 
-        // ----- draw city dots FIRST (no text yet) -----
         using var safeBrush = new SolidBrush(Color.FromArgb(60, 180, 75));
         using var unsafeBrush = new SolidBrush(Color.FromArgb(240, 80, 80));
         const int R = 6;
@@ -502,7 +497,6 @@ public partial class Form1 : Form
             g.DrawEllipse(Pens.Black, p.X - R, p.Y - R, R * 2, R * 2);
         }
 
-        // ===== draw CURRENT route (_route) so numbers/labels can be on top =====
         if (_route != null && _route.Length >= 2)
         {
             using var routePen = new Pen(Color.RoyalBlue, 2f);
@@ -514,12 +508,10 @@ public partial class Form1 : Form
                 var b = Pt(_route[k + 1]);
                 g.DrawLine(routePen, a, b);
             }
-            // close the loop
             var first = Pt(_route[0]);
             var last = Pt(_route[^1]);
             g.DrawLine(routePen, last, first);
 
-            // ----- step numbers ON TOP of route -----
             using var stepFont = new Font(Font.FontFamily, Math.Max(8f, Font.Size - 1f), FontStyle.Bold);
             using var stepBg = new SolidBrush(Color.FromArgb(230, Color.White));
             using var stepFg = new SolidBrush(Color.RoyalBlue);
@@ -530,14 +522,12 @@ public partial class Form1 : Form
                 var label = (step + 1).ToString();
                 var size = g.MeasureString(label, stepFont);
 
-                // small offset above node center
                 var rectLbl = new RectangleF(p.X - size.Width / 2, p.Y - size.Height - 14, size.Width + 4, size.Height);
                 g.FillRectangle(stepBg, rectLbl);
                 g.DrawString(label, stepFont, stepFg, rectLbl.X + 2, rectLbl.Y);
             }
         }
 
-        // ----- city labels LAST so they’re always readable -----
         using var textBrush = new SolidBrush(Color.Black);
         foreach (var c in _cities)
         {

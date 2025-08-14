@@ -81,9 +81,9 @@ public class Services
     }
 
 
-    internal static void Shuffle(int[] a, int? seed = null)
+    internal static void Shuffle(int[] a, Random rng)
     {
-        var rng = seed.HasValue ? new Random(seed.Value) : new Random();
+       
         for (int i = a.Length - 1; i > 0; i--)
         {
             int j = rng.Next(i + 1);
